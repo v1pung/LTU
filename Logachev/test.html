@@ -5,7 +5,7 @@
     <script src="script.js"></script>
 
 </head>
-<body>
+<body onLoad="myLoad()">
 
     <b>Количество лесных участков, подверженных болезни (вылечим)</b><br><br>
 
@@ -18,6 +18,10 @@
 
     <input type="button" value="Заполнить тестовыми данными" onClick="FillTestData(), Calc()" id="ButtonTestData"><br><hr>
     <div id="div1" style="display:none"></div>
+
+    <br>
+    <textarea id="mytextarea" placeholder="Скопируйте сюда все значения"
+    style="width:300px;"></textarea>
 
 </body>
 </html>
