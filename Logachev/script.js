@@ -1,5 +1,14 @@
 function myLoad() {
-    if(localStorage["ChisloYchastkov"]>0) {ChisloYchastkov.value=localStorage["ChisloYchastkov"]}
+    if(localStorage["ChisloYchastkov"] > 0) {ChisloYchastkov.value = localStorage["ChisloYchastkov"];
+
+        for (let i = 1; i <= ChisloYchastkov.value; i++) {
+            let element1 = "ploshad" + i;
+            if (localStorage[element1]) {
+                document.getElementById(element1).value = localStorage[element1];
+            }
+        }
+        TableYchastki();
+    }
 }
 
 
@@ -71,58 +80,6 @@ function AnomalHide() {
         element1 = "ploshad" + i;
         document.getElementById(element1).value = myarray[i-1];
     }
-}
-
-
-function TableYchastki() {
-    let n = ChisloYchastkov.value;
-
-    let a = mytextarea.value.split(/$\s*/m);
-    
-    if (a.length==0) {
-        n=ChisloYchastkov.value;            
-    }
-
-    else {
-        n=a.length;
-        mytextarea.style.height=n*15+'px';
-        ChisloYchastkov.value=n;
-    }
-
-    
-    div1.style.display = "block";
-    div1.innerHTML = "";
-    
-    for(let i = 1; i <= n; i++) {
-        if (i <= n) {
-            element1 = "ploshad" + i;
-            
-            if (localStorage[element1] == undefined) {
-                localStorage[element1] = ""
-            }
-            
-            div1.innerHTML += "<div style='display: inline-block; width: 400px;'>Площадь повреждённой территории на " + i + " участке:</div><input type='text' id='ploshad" + i + "' value='"+localStorage[element1]+"'><div id='lolkek" + i + "' style='display:inline-block'></div><br>";
-        }
-    }
-
-
-    div1.innerHTML = div1.innerHTML + "<hr><input type=button value='Поиск аномальных значений' onClick='Calc()' id='Button2'><br>"
-
-
-
-    div1.innerHTML = div1.innerHTML + "Общая площадь повреждённой территории: <input type=text id='SumPloshad'><br>"
-    div1.innerHTML = div1.innerHTML + "Средняя площадь повреждённой территории: <input type=text id='SredPloshad'><br>"
-    div1.innerHTML = div1.innerHTML + "Среднеквадратическое отклонение: <input type=text id='Otklonenie'><br>"
-    div1.innerHTML = div1.innerHTML + "Коэффициент: <input type=text id='koef'><br>"
-
-    if (a.length>0) {
-        for (let i=1;i<=n;i++) {
-            element1 = "ploshad" + i;
-            document.getElementById(element1).value = a[i-1];
-        }
-    }
-
-    localStorage["ChisloYchastkov"] = n;    
 }
 
 function Calc() {
@@ -203,4 +160,61 @@ function FillTestData() {
     for (let i = 1; i <= testData.length; i++) {
         document.getElementById('ploshad' + i).value = testData[i-1];
     }
+}
+
+function handleNext() {
+    TableYchastki();
+    Calc();
+    mytextarea.value = "";
+}
+
+function TableYchastki() {
+    let n = ChisloYchastkov.value;
+
+    let a = mytextarea.value.split(/$\s*/m);
+
+    if (a.length==0) {
+        n=ChisloYchastkov.value;
+    }
+
+    else {
+        n=a.length;
+        mytextarea.style.height=n*15+'px';
+        ChisloYchastkov.value=n;
+    }
+
+
+    div1.style.display = "block";
+    div1.innerHTML = "";
+
+    for(let i = 1; i <= n; i++) {
+        if (i <= n) {
+            element1 = "ploshad" + i;
+
+            if (localStorage[element1] == undefined) {
+                localStorage[element1] = ""
+            }
+
+            div1.innerHTML += "<div style='display: inline-block; width: 400px;'>Площадь повреждённой территории на " + i + " участке:</div><input type='text' id='ploshad" + i + "' value='"+localStorage[element1]+"'><div id='lolkek" + i + "' style='display:inline-block'></div><br>";
+        }
+    }
+
+
+    div1.innerHTML = div1.innerHTML + "<hr><input type=button value='Поиск аномальных значений' onClick='Calc()' id='Button2'><br>"
+
+
+
+    div1.innerHTML = div1.innerHTML + "Общая площадь повреждённой территории: <input type=text id='SumPloshad'><br>"
+    div1.innerHTML = div1.innerHTML + "Средняя площадь повреждённой территории: <input type=text id='SredPloshad'><br>"
+    div1.innerHTML = div1.innerHTML + "Среднеквадратическое отклонение: <input type=text id='Otklonenie'><br>"
+    div1.innerHTML = div1.innerHTML + "Коэффициент: <input type=text id='koef'><br>"
+
+    if (a.length>0) {
+        for (let i=1;i<=n;i++) {
+            element1 = "ploshad" + i;
+            document.getElementById(element1).value = a[i-1];
+        }
+    }
+
+    localStorage["ChisloYchastkov"] = n;
 }
