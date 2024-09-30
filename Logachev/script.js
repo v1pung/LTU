@@ -162,7 +162,7 @@ function FillTestData() {
     }
 }
 
-function handleNext() {
+function Next() {
     TableYchastki();
     Calc();
     mytextarea.value = "";
