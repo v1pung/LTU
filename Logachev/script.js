@@ -1,14 +1,8 @@
-function myLoad() {
-    if(localStorage["ChisloYchastkov"] > 0) {ChisloYchastkov.value = localStorage["ChisloYchastkov"];
+let parametr=location.search.substring(1).split("&");
 
-        for (let i = 1; i <= ChisloYchastkov.value; i++) {
-            let element1 = "ploshad" + i;
-            if (localStorage[element1]) {
-                document.getElementById(element1).value = localStorage[element1];
-            }
-        }
-        TableYchastki();
-    }
+function myLoad() {
+    if(localStorage["ChisloYchastkov"] > 0) {ChisloYchastkov.value = localStorage["ChisloYchastkov"];}
+    if(parametr.length > 1) { ChisloYchastkov.value = parametr.length; TableYchastki();Calc();}
 }
 
 
@@ -179,7 +173,6 @@ function TableYchastki() {
 
     else {
         n=a.length;
-        mytextarea.style.height=n*15+'px';
         ChisloYchastkov.value=n;
     }
 
@@ -194,8 +187,8 @@ function TableYchastki() {
             if (localStorage[element1] == undefined) {
                 localStorage[element1] = ""
             }
-
-            div1.innerHTML += "<div style='display: inline-block; width: 400px;'>Площадь повреждённой территории на " + i + " участке:</div><input type='text' id='ploshad" + i + "' value='"+localStorage[element1]+"'><div id='lolkek" + i + "' style='display:inline-block'></div><br>";
+            if (parametr.length > 1) { localStorage[element1] = parametr[i - 1]; }
+            div1.innerHTML += "<div style='display: inline-block; width: 400px;'>Площадь повреждённой территории на <b>" + i + " участке</b>:</div><input type='text' id='ploshad" + i + "' value='"+localStorage[element1]+"'><div id='lolkek" + i + "' style='display:inline-block'></div><br>";
         }
     }
 
@@ -218,3 +211,26 @@ function TableYchastki() {
 
     localStorage["ChisloYchastkov"] = n;
 }
+
+function savedtext(){
+    let n=ChisloYchastkov.value;
+    let mysavedtext="";
+    for(let i=1;i<=n;i++)
+    {
+    element1="ploshad"+i;
+    mysavedtext=mysavedtext+document.getElementById(element1).value+';';
+    }
+    document.write('<a href="data:text/plain;charset=utf-8,%EF%BB%BF' + encodeURIComponent(mysavedtext) + '" download="значения.txt">значения.txt</a>');
+}
+
+function deletepole(){
+    let n=ChisloYchastkov.value;
+    for(let i=1;i<=n;i++)
+    {
+    element1="ploshad"+i;
+    document.getElementById(element1).value="";
+    localStorage[element1]="";
+    }
+    Calc();
+}
+//создание глобальнйо переменной, добавить в место, где проверяем на красный цвет, а потом добавка в кнопку сохранить
