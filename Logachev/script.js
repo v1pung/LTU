@@ -110,6 +110,12 @@ function Calc() {
             element1 = "ploshad" + i;
             localStorage[element1] = document.getElementById(element1).value;
             SumPloshad.value =+ SumPloshad.value+ + document.getElementById(element1).value;
+
+            maxv = 0
+            if (parseFloat(document.getElementById(element1).value) > maxv) {
+                maxv=parseFloat(document.getElementById(element1).value)
+            }
+
         }
     }
 
@@ -142,10 +148,11 @@ function Calc() {
                 document.getElementById(element2).innerHTML = '';
             }
         }
+        CanvDraw()
 }
 
 function FillTestData() {
-    let testData = [1, 10, 20, 15, 25, 100];
+    let testData = [10, 10, 10, 15, 25, 200];
     ChisloYchastkov.value = testData.length;
 
     TableYchastki(); // Создаем таблицу участков
@@ -232,5 +239,166 @@ function deletepole(){
     localStorage[element1]="";
     }
     Calc();
+}
+
+
+function preSaveCheck() {
+        if (checkForAnomal().anomalFound) {
+          userConfirmation = confirm(
+            "В данных все еще могут быть аномальные значения. Точно сохранить?"
+          );
+          if (userConfirmation) {
+            savedtext();
+          }
+        } else {
+          savedtext();
+        }
+      }
+
+function loadNumbersFromCells() {
+    let result = [];
+    for (let i = 1; i < Number.MAX_SAFE_INTEGER; i++) {
+      try {
+        let cell = document.getElementById("ploshad" + i);
+        result[i] = cell.value;
+      } catch (error) {
+        return result;
+      }
+    }
+}
+
+function getK(n) {
+    if (n <= 5) {
+      return 1.791;
+    } else if (5 < n < 10) {
+      return 2.146;
+    } else if (15 < n < 20) {
+      return 2.447;
+    } else if (20 < n < 25) {
+      return 2.537;
+    } else if (25 < n) {
+      return 2.633;
+    } else {
+      return 2.146;
+    }
+}
+
+function checkForAnomal() {
+    let numbers = loadNumbersFromCells();
+    n = numbers.length;
+    k = getK(numbers.length);
+
+    clearNumbers = [];
+    clearIndexes = [];
+
+    anomalNumbers = [];
+    anomalIndexes = [];
+
+    for (let i = 0; i < n; i++) {
+      if ((numbers[i] - SredPloshad.value) / Otklonenie.value >= k) {
+        anomalIndexes.push(i);
+        anomalNumbers.push(numbers[i]);
+      } else {
+        clearIndexes.push(i);
+        clearNumbers.push(numbers[i]);
+      }
+    }
+    const anomalFound = anomalIndexes.length > 0 ? true : false;
+
+    return {
+      clearIndexes: clearIndexes,
+      clearNumbers: clearNumbers,
+      anomalIndexes: anomalIndexes,
+      anomalNumbers: anomalNumbers,
+      anomalFound: anomalFound,
+    };
+}
+
+function CanvDraw() {
+    let max = koef.value * Otklonenie.value + +SredPloshad.value;
+    let mid = parseFloat(SredPloshad.value);
+    let disp = mid + parseFloat(Otklonenie.value);
+    let canv = document.getElementById("canv");
+    let ctx = canv.getContext('2d');
+    let koord;
+
+    canv.width = 600;
+    canv.height = 300;
+
+    ctx.beginPath();
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 1;
+    ctx.moveTo(5.5,5.5);
+    ctx.lineTo(3.5,15.5);
+    ctx.moveTo(5.5,5.5);
+    ctx.lineTo(7.5,15.5);
+    ctx.moveTo(5.5,5.5);
+    ctx.lineTo(5.5,280.5);
+    ctx.lineTo(590.5,280.5);
+    ctx.lineTo(580.5,278.5);
+    ctx.moveTo(590.5,280.5);
+    ctx.lineTo(580.5,282.5);
+    ctx.stroke();
+
+    let n = ChisloYchastkov.value;
+
+    // pov = podshet povtorov koorda
+    // функция повторов работает нормально
+
+    // let i = 10 * n
+    // for { рисуем крестик + i по оси y чтобы они повторялись}
+    // нужно как-то их нарисовать
+
+//    for(let i = 1; i <= n, i++) {
+//        element1 = "ploshad" + i;
+//        koord = document.getElementById(element1).value;
+//
+//        pov = povtor(loadNumbersFromCells(), koord)
+//    }
+
+    for(let i = 1; i <= n; i++)
+    {
+        element1 = "ploshad" + i;
+        koord = document.getElementById(element1).value;
+
+        ctx.moveTo(5.5+570.5*koord/maxv-3,152.5);
+        ctx.lineTo(5.5+570.5*koord/maxv+3,146.5);
+        ctx.stroke();
+        ctx.moveTo(5.5+570.5*koord/maxv+3,152.5);
+        ctx.lineTo(5.5+570.5*koord/maxv-3,146.5);
+        ctx.stroke();
+    }
+    ctx.closePath();
+
+    ctx.beginPath();
+    ctx.strokeStyle = "red";
+    ctx.moveTo(5.5+570.5*max/maxv,5.5);
+    ctx.lineTo(5.5+570.5*max/maxv,280.5);
+    ctx.stroke();
+    ctx.closePath();
+    ctx.beginPath();
+    ctx.strokeStyle = "green";
+    ctx.moveTo(5.5+570.5*mid/maxv,5.5);
+    ctx.lineTo(5.5+570.5*mid/maxv,280.5);
+    ctx.stroke();
+    ctx.closePath();
+    ctx.beginPath();
+    ctx.strokeStyle = "yellow";
+    ctx.moveTo(5.5+570.5*disp/maxv,5.5);
+    ctx.lineTo(5.5+570.5*disp/maxv,280.5);
+    ctx.stroke();
+    ctx.closePath();
+}
+
+function povtor(myarray, value) {
+    let count = 0;
+    array = myarray.slice(1)
+    console.log(array)
+    for (let i = 0; i < array.length; i++) {
+        if (array[i] === value) {
+            count++;
+        }
+    }
+    return count;
 }
 //создание глобальнйо переменной, добавить в место, где проверяем на красный цвет, а потом добавка в кнопку сохранить
