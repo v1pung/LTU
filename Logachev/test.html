@@ -14,14 +14,17 @@
 
     <input type="button" value="+" onClick="ChisloYchastkov.value = parseInt(ChisloYchastkov.value) + 1; TableYchastki()" id="ButtonIncrease">
 
-    <input type="button" value="Далее" onClick="TableYchastki()" id="Button1"><br><hr>
+    <input type="button" value="Далее" onClick="Next()" id="Button1"><br><hr>
 
     <input type="button" value="Заполнить тестовыми данными" onClick="FillTestData(), Calc()" id="ButtonTestData"><br><hr>
     <div id="div1" style="display:none"></div>
 
     <br>
     <textarea id="mytextarea" placeholder="Скопируйте сюда все значения"
-    style="width:300px;"></textarea>
+    style="width:300px;"></textarea><br><hr>
+    <input type="button" value="Сохранить" onClick="savedtext()" id="Button3"><br><hr>
+    <input type="button" value="Удалить введённые значения" onClick="deletepole()" id="Button4"><br><hr>
+
 
 </body>
 </html>
