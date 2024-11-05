@@ -25,7 +25,8 @@ function AnomalMax() {
 
     for(let i = 1; i <= n; i++) {
         element1 = "ploshad" + i;
-        if (document.getElementById(element1).value > Number(mymax) && (document.getElementById(element1).value - SredPloshad.value) / Otklonenie.value < koef.value) {
+        if (document.getElementById(element1).value > Number(mymax) &&
+            (document.getElementById(element1).value - SredPloshad.value) / Otklonenie.value < koef.value) {
             mymax = document.getElementById(element1).value
             }
     }
@@ -108,6 +109,10 @@ function Calc() {
     for(let i = 1;i <= n; i++) {
         if(i <= n) {
             element1 = "ploshad" + i;
+
+            element2="koord"+i;	
+            localStorage[element2]=document.getElementById(element2).value;
+            
             localStorage[element1] = document.getElementById(element1).value;
             SumPloshad.value =+ SumPloshad.value+ + document.getElementById(element1).value;
 
@@ -124,6 +129,10 @@ function Calc() {
     for(let i = 1;i <= n; i++) {
         if(i <= n) {
             element1 = "ploshad" + i;
+
+            element2="koord"+i;	
+            localStorage[element2]=document.getElementById(element2).value;
+
             Otklonenie.value =+ Otklonenie.value + Math.pow(document.getElementById(element1).value - SredPloshad.value, 2);
         }
     }
@@ -132,12 +141,16 @@ function Calc() {
 
     for (let i = 1; i <= n; i++) {
             let element1 = "ploshad" + i;
-            let element2 = "lolkek" + i;
+
+            element2="koord"+i;	
+            localStorage[element2]=document.getElementById(element2).value;
+
+            let element3 = "lolkek" + i;
             let deviation = (document.getElementById(element1).value - SredPloshad.value) / Otklonenie.value;
             if (deviation >= k) {
                 document.getElementById(element1).style.background = 'red';
 
-                document.getElementById(element2).innerHTML = "<input type=button value='-' onClick='AnomalHide(), Calc()' id='Button${i}'>"
+                document.getElementById(element3).innerHTML = "<input type=button value='-' onClick='AnomalHide(), Calc()' id='Button${i}'>"
                 + "<input type=button value='mid' onClick='AnomalMid(), Calc()' id='Button${i}'>" 
                 + "<input type=button value='max' onClick='AnomalMax(), Calc()' id='Button${i}'>"
                 + "<input type=button value='maxA' onClick='AnomalMaxCalc(), Calc()' id='Button${i}'>";
@@ -145,14 +158,15 @@ function Calc() {
             } 
             else {
                 document.getElementById(element1).style.background = '';
-                document.getElementById(element2).innerHTML = '';
+                document.getElementById(element3).innerHTML = '';
             }
         }
-        CanvDraw()
+        CanvDraw();
+        map(); //////////////////////////////////////////////////////////////////////////////////
 }
 
 function FillTestData() {
-    let testData = [10, 10, 10, 15, 25, 200];
+    let testData = [5, 5, 7, 10, 12, 40];
     ChisloYchastkov.value = testData.length;
 
     TableYchastki(); // Создаем таблицу участков
@@ -191,11 +205,26 @@ function TableYchastki() {
         if (i <= n) {
             element1 = "ploshad" + i;
 
+            element2 = "koord" + i;	
+            if (localStorage[element2] == undefined) {
+                localStorage[element2] = ""
+            }
+
+
             if (localStorage[element1] == undefined) {
                 localStorage[element1] = ""
             }
-            if (parametr.length > 1) { localStorage[element1] = parametr[i - 1]; }
-            div1.innerHTML += "<div style='display: inline-block; width: 400px;'>Площадь повреждённой территории на <b>" + i + " участке</b>:</div><input type='text' id='ploshad" + i + "' value='"+localStorage[element1]+"'><div id='lolkek" + i + "' style='display:inline-block'></div><br>";
+
+            if (parametr.length > 1) { 
+                localStorage[element1] = parametr[i - 1]; 
+            }
+
+            div1.innerHTML += "<div style='display: inline-block; width: 400px;'>Площадь повреждённой территории на <b>" + i
+             + " участке</b>:</div><input type='text' id='ploshad" + i
+             + "' value='" + localStorage[element1]+"'><div id='lolkek" + i + "' style='display:inline-block'></div><br>";
+
+            div1.innerHTML += "<div style='display: inline-block; width: 275px;'>Координаты контура <b>" + i
+             + "-го участка</b></div><input type=text id='koord" + i + "' value='"+localStorage[element2] + "'></input>";
         }
     }
 
@@ -212,6 +241,9 @@ function TableYchastki() {
     if (a.length>0) {
         for (let i=1;i<=n;i++) {
             element1 = "ploshad" + i;
+            element2="koord"+i;	
+            if(localStorage[element2]==undefined) {localStorage[element2]=""}            
+
             document.getElementById(element1).value = a[i-1];
         }
     }
@@ -319,6 +351,7 @@ function CanvDraw() {
     let mid = parseFloat(SredPloshad.value);
     let disp = mid + parseFloat(Otklonenie.value);
     let canv = document.getElementById("canv");
+    let canv2 = document.getElementById("canv2"); ///////////////////////////////////////// ?????????
     let ctx = canv.getContext('2d');
     let koord;
 
@@ -342,63 +375,143 @@ function CanvDraw() {
 
     let n = ChisloYchastkov.value;
 
-    // pov = podshet povtorov koorda
-    // функция повторов работает нормально
+    ctx.closePath();
 
-    // let i = 10 * n
-    // for { рисуем крестик + i по оси y чтобы они повторялись}
-    // нужно как-то их нарисовать
+    let j = 0;
 
-//    for(let i = 1; i <= n, i++) {
-//        element1 = "ploshad" + i;
-//        koord = document.getElementById(element1).value;
-//
-//        pov = povtor(loadNumbersFromCells(), koord)
-//    }
-
-    for(let i = 1; i <= n; i++)
+    for (let i = 1; i <= n; i++)
     {
+        let flag = false;
+        let midy = canv.height / 2;
+        const newy = midy + j;
         element1 = "ploshad" + i;
         koord = document.getElementById(element1).value;
 
-        ctx.moveTo(5.5+570.5*koord/maxv-3,152.5);
-        ctx.lineTo(5.5+570.5*koord/maxv+3,146.5);
-        ctx.stroke();
-        ctx.moveTo(5.5+570.5*koord/maxv+3,152.5);
-        ctx.lineTo(5.5+570.5*koord/maxv-3,146.5);
-        ctx.stroke();
+        if ( koord >= max) {
+            console.log('anomal')
+            ctx.strokeStyle = "red";
+        }
+        else {
+            console.log('norm')
+            ctx.strokeStyle = "black";
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(5.5+570.5*koord/maxv-3,newy + 2,5);
+            ctx.lineTo(5.5+570.5*koord/maxv+3,newy - 2.5);
+            ctx.stroke();
+            ctx.moveTo(5.5+570.5*koord/maxv+3,newy + 2.5);
+            ctx.lineTo(5.5+570.5*koord/maxv-3,newy - 2.5);
+            ctx.stroke();
+            ctx.closePath();
+
+
+        j -= 10;
+
+        ctx.fillText(Math.round(koord), 5.5 + 570.5 * koord / maxv - 5, 295.5) // zna4eniya
+        ctx.fillText(0, 5, 295.5) // nol
     }
-    ctx.closePath();
 
     ctx.beginPath();
     ctx.strokeStyle = "red";
+
+    ctx.fillText("Аномал.", 5.5 + 570.5 * max / maxv - 10, 10) // things
+    ctx.fillText(Math.round(max), 5.5 + 570.5 * max / maxv - 10, 25) // things
+
     ctx.moveTo(5.5+570.5*max/maxv,5.5);
     ctx.lineTo(5.5+570.5*max/maxv,280.5);
     ctx.stroke();
     ctx.closePath();
+
     ctx.beginPath();
+
     ctx.strokeStyle = "green";
+
+    ctx.fillText("Сред.", 5.5 + 570.5 * mid / maxv - 10, 10) // things
+    ctx.fillText(Math.round(mid), 5.5 + 570.5 * mid / maxv - 10, 25) // things
+
     ctx.moveTo(5.5+570.5*mid/maxv,5.5);
     ctx.lineTo(5.5+570.5*mid/maxv,280.5);
     ctx.stroke();
     ctx.closePath();
     ctx.beginPath();
+
     ctx.strokeStyle = "yellow";
+
+    ctx.fillText("Откл.", 5.5 + 570.5 * disp / maxv - 10, 10) // things
+    ctx.fillText(Math.round(disp), 5.5 + 570.5 * disp / maxv - 10, 25) // things
+
     ctx.moveTo(5.5+570.5*disp/maxv,5.5);
     ctx.lineTo(5.5+570.5*disp/maxv,280.5);
     ctx.stroke();
+
+    let disp2 = mid - parseFloat(Otklonenie.value);
+
+    ctx.fillText("Откл.", 5.5 + 570.5 * disp2 / maxv - 10, 10) // things
+    ctx.fillText(Math.round(disp2), 5.5 + 570.5 * disp2/maxv - 10, 25) // things
+
+    ctx.moveTo(5.5+570.5 * disp2 / maxv, 5.5);
+    ctx.lineTo(5.5+570.5 * disp2 / maxv, 280.5);
+    ctx.stroke();
+
     ctx.closePath();
+    map(); //////////////// ???????????
 }
 
-function povtor(myarray, value) {
-    let count = 0;
-    array = myarray.slice(1)
-    console.log(array)
-    for (let i = 0; i < array.length; i++) {
-        if (array[i] === value) {
-            count++;
+function map() { //////////////////////////////////////////////////////
+    let canv = document.getElementById("canv2");
+    let ctx = canv.getContext('2d');
+
+    canv.width = 600;
+    canv.height = 300;
+
+    let pic = new Image();
+    ctx = canv.getContext('2d');
+    pic.src = 'map.jpg';
+    canv.width = 600;
+    canv.height = 300;
+
+    pic.onload = function()
+    {
+        ctx.drawImage(pic, 0, 0, canv.width, canv.height);
+        let n = parseFloat(ChisloYchastkov.value);
+
+        for (let i = 1; i <= n; i++) {
+            sredX = 0;
+            sredY = 0;
+
+            element1 = "ploshad"+i;
+            element2 = "koord"+i;
+
+            koord = document.getElementById(element2).value;
+            koordmass=koord.split(";");
+
+            ctx.beginPath();
+            // let p = 0;
+            ctx.fillStyle = "rgba(255, 255, 0, 0.7)"; // 255 - p
+            // p -= 5;
+
+            if ((document.getElementById(element1).value - SredPloshad.value) / Otklonenie.value >= koef.value) {
+                ctx.fillStyle = "rgba(255, 0, 0, 0.7)";
+            }
+
+            for (let j = 1; j < koordmass.length; j += 2) {
+                if (j > 1) {
+                    ctx.lineTo(koordmass[j-1], koordmass[j]);
+                }
+                else {
+                    ctx.moveTo(koordmass[j-1], koordmass[j]);
+                }
+                sredX = (sredX * ((koordmass.length-1) / 2) + parseFloat(koordmass[j-1])) / ((koordmass.length-1) / 2);
+                sredY = (sredY * ((koordmass.length-1) / 2) + parseFloat(koordmass[j])) / ((koordmass.length-1) / 2);
+            }
+            
+            ctx.fill();
+            ctx.closePath();
+            ctx.fillStyle = "black";
+            ctx.font = "italic 16pt Arial";
+            ctx.fillText(document.getElementById(element1).value, sredX, sredY);
         }
     }
-    return count;
+
 }
-//создание глобальнйо переменной, добавить в место, где проверяем на красный цвет, а потом добавка в кнопку сохранить
