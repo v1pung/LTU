@@ -166,7 +166,7 @@ function Calc() {
 }
 
 function FillTestData() {
-    let testData = [5, 5, 7, 10, 12, 40];
+    let testData = [5, 5, 7, 10, 32, 46, 11, 8, 4, 70];
     ChisloYchastkov.value = testData.length;
 
     TableYchastki(); // Создаем таблицу участков
@@ -201,6 +201,7 @@ function TableYchastki() {
     div1.style.display = "block";
     div1.innerHTML = "";
 
+
     for(let i = 1; i <= n; i++) {
         if (i <= n) {
             element1 = "ploshad" + i;
@@ -223,8 +224,10 @@ function TableYchastki() {
              + " участке</b>:</div><input type='text' id='ploshad" + i
              + "' value='" + localStorage[element1]+"'><div id='lolkek" + i + "' style='display:inline-block'></div><br>";
 
-            div1.innerHTML += "<div style='display: inline-block; width: 275px;'>Координаты контура <b>" + i
+/////////////////////////////////
+            div1.innerHTML += "<div style='display: inline-block; width: 375px;'>Координаты контура <b>" + i
              + "-го участка</b></div><input type=text id='koord" + i + "' value='"+localStorage[element2] + "'></input>";
+
         }
     }
 
@@ -241,7 +244,7 @@ function TableYchastki() {
     if (a.length>0) {
         for (let i=1;i<=n;i++) {
             element1 = "ploshad" + i;
-            element2="koord"+i;	
+            element2 = "koord" + i;	/////////////////////////////
             if(localStorage[element2]==undefined) {localStorage[element2]=""}            
 
             document.getElementById(element1).value = a[i-1];
@@ -462,6 +465,11 @@ function map() { //////////////////////////////////////////////////////
     let canv = document.getElementById("canv2");
     let ctx = canv.getContext('2d');
 
+    let max = koef.value * Otklonenie.value + +SredPloshad.value;
+    let mid = parseFloat(SredPloshad.value);
+    let disp = mid + parseFloat(Otklonenie.value);
+    let disp2 = mid - parseFloat(Otklonenie.value);
+
     canv.width = 600;
     canv.height = 300;
 
@@ -471,25 +479,33 @@ function map() { //////////////////////////////////////////////////////
     canv.width = 600;
     canv.height = 300;
 
-    pic.onload = function()
-    {
+    pic.onload = function() {
         ctx.drawImage(pic, 0, 0, canv.width, canv.height);
         let n = parseFloat(ChisloYchastkov.value);
-
+        let p = 125;
+        let pp = 255;
         for (let i = 1; i <= n; i++) {
             sredX = 0;
             sredY = 0;
 
-            element1 = "ploshad"+i;
-            element2 = "koord"+i;
+            element1 = "ploshad" + i;
+            element2 = "koord" + i;
 
             koord = document.getElementById(element2).value;
-            koordmass=koord.split(";");
+            koordmass = koord.split(";");
 
-            ctx.beginPath();
-            // let p = 0;
-            ctx.fillStyle = "rgba(255, 255, 0, 0.7)"; // 255 - p
-            // p -= 5;
+
+            if ((document.getElementById(element1).value <= disp) && (document.getElementById(element1).value >= disp2) ) {
+                ctx.beginPath();
+                ctx.fillStyle = "rgba(0, "+p+", 0, 0.7)"; // 255 - p
+                p -= 10;
+            }
+            else {
+                ctx.beginPath();
+                ctx.fillStyle = "rgba("+pp+", 255, 0, 0.8)"; // 255 - p
+                pp -= 10;
+            }
+
 
             if ((document.getElementById(element1).value - SredPloshad.value) / Otklonenie.value >= koef.value) {
                 ctx.fillStyle = "rgba(255, 0, 0, 0.7)";
