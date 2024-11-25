@@ -470,76 +470,68 @@ function CanvDraw() {
     map(); //////////////// ???????????
 }
 
-function map() { //////////////////////////////////////////////////////
-    let canv = document.getElementById("canv2");
-    let ctx = canv.getContext('2d');
+function map() {
+        let canv = document.getElementById("canv2");
+        let ctx = canv.getContext('2d');
+        canv.width = 600;
+        canv.height = 300;
 
-    let max = koef.value * Otklonenie.value + +SredPloshad.value;
-    let mid = parseFloat(SredPloshad.value);
-    let disp = mid + parseFloat(Otklonenie.value);
-    let disp2 = mid - parseFloat(Otklonenie.value);
+        let pic = new Image();
+        pic.src = 'map.jpg';
 
-    canv.width = 600;
-    canv.height = 300;
+        pic.onload = function() {
+            ctx.drawImage(pic, 0, 0, canv.width, canv.height);
 
-    let pic = new Image();
-    ctx = canv.getContext('2d');
-    pic.src = 'map.jpg';
-    canv.width = 600;
-    canv.height = 300;
+            let n = parseFloat(document.getElementById("ChisloYchastkov").value);
 
-    pic.onload = function() {
-        ctx.drawImage(pic, 0, 0, canv.width, canv.height);
-        let n = parseFloat(ChisloYchastkov.value);
-        let p = 125;
-        let pp = 255;
-        for (let i = 1; i <= n; i++) {
-            sredX = 0;
-            sredY = 0;
+            for (let i = 1; i <= n; i++) {
+                let sredX = 0;
+                let sredY = 0;
 
-            element1 = "ploshad" + i;
-            element2 = "koord" + i;
+                let element1 = "ploshad" + i;
+                let element2 = "koord" + i;
 
-            koord = document.getElementById(element2).value;
-            koordmass = koord.split(";");
+                let koord = document.getElementById(element2).value;
+                let koordmass = koord.split(";");
 
-
-            if ((document.getElementById(element1).value <= disp) && (document.getElementById(element1).value >= disp2) ) {
                 ctx.beginPath();
-                ctx.fillStyle = "rgba(0, "+p+", 0, 0.7)"; // 255 - p
-                p -= 10;
-            }
-            else {
-                ctx.beginPath();
-                ctx.fillStyle = "rgba("+pp+", 255, 0, 0.8)"; // 255 - p
-                pp -= 10;
-            }
+                let ploshadValue = parseFloat(document.getElementById(element1).value);
+                let sredPloshad = parseFloat(document.getElementById("SredPloshad").value);
+                let otklonenie = parseFloat(document.getElementById("Otklonenie").value);
+                let koef = parseFloat(document.getElementById("koef").value);
 
-
-            if ((document.getElementById(element1).value - SredPloshad.value) / Otklonenie.value >= koef.value) {
-                ctx.fillStyle = "rgba(255, 0, 0, 0.7)";
-            }
-
-            for (let j = 1; j < koordmass.length; j += 2) {
-                if (j > 1) {
-                    ctx.lineTo(koordmass[j-1], koordmass[j]);
+                if ((ploshadValue - sredPloshad) / otklonenie >= koef) {
+                    ctx.fillStyle = "rgba(255, 0, 0, 0.7)"; //аномальный участок, красный цвет
                 }
-                else {
-                    ctx.moveTo(koordmass[j-1], koordmass[j]);
+                else if (Math.abs(ploshadValue - sredPloshad) <= otklonenie) {
+                    let zelVariant = Math.floor(255 * (1 - Math.abs(ploshadValue - sredPloshad) / (otklonenie)));
+                    ctx.fillStyle = `rgba(0, ${zelVariant}, 0, 0.7)`; //в пределах зелёной линии
+                } else {
+                    ctx.fillStyle = "rgba(255, 255, 0, 0.7)"; //вышло за линии отклонений, жёлтый
                 }
-                sredX = (sredX * ((koordmass.length-1) / 2) + parseFloat(koordmass[j-1])) / ((koordmass.length-1) / 2);
-                sredY = (sredY * ((koordmass.length-1) / 2) + parseFloat(koordmass[j])) / ((koordmass.length-1) / 2);
+
+                for (let j = 1; j < koordmass.length; j += 2) {
+                    if (j > 1) {
+                        ctx.lineTo(koordmass[j - 1], koordmass[j]);
+                    } else {
+                        ctx.moveTo(koordmass[j - 1], koordmass[j]);
+                    }
+
+                    sredX = (sredX * ((koordmass.length - 1) / 2) + parseFloat(koordmass[j - 1])) / ((koordmass.length - 1) / 2);
+                    sredY = (sredY * ((koordmass.length - 1) / 2) + parseFloat(koordmass[j])) / ((koordmass.length - 1) / 2);
+                }
+
+                ctx.fill();
+                ctx.closePath();
+
+                ctx.fillStyle = "black";
+                ctx.font = "italic 16pt Arial";
+                ctx.fillText(ploshadValue, sredX, sredY);
             }
-            
-            ctx.fill();
-            ctx.closePath();
-            ctx.fillStyle = "black";
-            ctx.font = "italic 16pt Arial";
-            ctx.fillText(document.getElementById(element1).value, sredX, sredY);
-        }
+        };
     }
 
-let colored = null;
+    let colored = null;
 
     //функция для выделения выбранного участка
     function drawColourMap(index) {
@@ -618,5 +610,3 @@ let colored = null;
             }
         };
     }
-
-}
