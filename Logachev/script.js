@@ -106,13 +106,26 @@ function Calc() {
     SredPloshad.value = 0;
     Otklonenie.value = 0;
 
+    let koordstorage = ["180;0;170;20;230;30;250;0;",
+                    "260;0;240;35;280;55;310;0;",
+                    "330;0;300;55;340;75;380;0;",
+                    "390;0;360;80;600;150;600;0;",
+                    "155;35;200;80;600;200;600;170;",
+                    "20;5;60;65;40;160;190;120;120;20;",
+                    "45;260;110;250;120;300;60;300;",
+                    "210;120;240;125;245;300;160;300;",
+                    "270;135;440;170;360;300;260;300;",
+                    "455;173;540;200;520;300;380;300;"]
+
     for(let i = 1;i <= n; i++) {
         if(i <= n) {
             element1 = "ploshad" + i;
 
             element2="koord"+i;	
-            localStorage[element2]=document.getElementById(element2).value;
-            
+//            localStorage[element2]=document.getElementById(element2).value;
+//            localStorage[element2] = koordstorage[i];
+            document.getElementById(element2).value = koordstorage[i - 1]
+
             localStorage[element1] = document.getElementById(element1).value;
             SumPloshad.value =+ SumPloshad.value+ + document.getElementById(element1).value;
 
@@ -185,83 +198,79 @@ function Next() {
 
 function TableYchastki() {
     let n = ChisloYchastkov.value;
-
     let a = mytextarea.value.split(/$\s*/m);
 
-    if (a.length==0) {
-        n=ChisloYchastkov.value;
+    if (a.length == 0) {
+        n = ChisloYchastkov.value;
     }
-
     else {
-        n=a.length;
-        ChisloYchastkov.value=n;
-    }
+        n = a.length;
 
+        ChisloYchastkov.value = n;
+    }
 
     div1.style.display = "block";
     div1.innerHTML = "";
 
+    for (let i = 1; i <= n; i++) {
+        let element1 = "ploshad" + i;
 
-    for(let i = 1; i <= n; i++) {
-        if (i <= n) {
-            element1 = "ploshad" + i;
-
-            element2 = "koord" + i;	
-            if (localStorage[element2] == undefined) {
-                localStorage[element2] = ""
-            }
-
-
-            if (localStorage[element1] == undefined) {
-                localStorage[element1] = ""
-            }
-
-            if (parametr.length > 1) { 
-                localStorage[element1] = parametr[i - 1]; 
-            }
-
-            div1.innerHTML += "<div style='display: inline-block; width: 400px;'>Площадь повреждённой территории на <b>" + i
-             + " участке</b>:</div><input type='text' id='ploshad" + i
-             + "' value='" + localStorage[element1]+"'><div id='lolkek" + i + "' style='display:inline-block'></div><br>";
-
-/////////////////////////////////
-            div1.innerHTML += "<div style='display: inline-block; width: 375px;'>Координаты контура <b>" + i
-             + "-го участка</b></div><input type=text id='koord" + i + "' value='"+localStorage[element2] + "'></input>";
-
+        if (localStorage[element1] == undefined) {
+            localStorage[element1] = "";
         }
+
+        let element2 = "koord" + i;
+
+        if (localStorage[element2] == undefined) {
+            localStorage[element2] = "";
+        }
+
+        if (parametr.length > 1) {
+            localStorage[element1] = parametr[i - 1]
+        }
+
+        div1.innerHTML += `
+            <div style='display: inline-block; width: 400px;'>Площадь повреждённой территории на ${i} участке:</div>
+            <input type='text' id='ploshad${i}' value='${localStorage[element1]}'
+            onfocus='drawColourMap(${i})' onblur='redrawColourMap()'>
+            <div style='display:inline-block;width:275px'>Координаты контура <b>${i}-го участка</b></div>
+
+            <input type='text' id='koord${i}' value='${localStorage[element2]}'
+            onfocus='drawColourMap(${i})' onblur='redrawColourMap()'>
+            <div id='lolkek${i}' style='display:inline-block'></div><br>`;
     }
 
+        div1.innerHTML += `
+            <hr>
+            <input type='button' value='Поиск аномальных значений' onClick='Calc()' id='Button2'><br>
 
-    div1.innerHTML = div1.innerHTML + "<hr><input type=button value='Поиск аномальных значений' onClick='Calc()' id='Button2'><br>"
+            Общая площадь повреждённой территории: <input type='text' id='SumPloshad'><br>
+            Средняя площадь повреждённой территории: <input type='text' id='SredPloshad'><br>
+            Среднеквадратическое отклонение: <input type='text' id='Otklonenie'><br>
+            Коэффициент: <input type='text' id='koef'><br>`;
 
-
-
-    div1.innerHTML = div1.innerHTML + "Общая площадь повреждённой территории: <input type=text id='SumPloshad'><br>"
-    div1.innerHTML = div1.innerHTML + "Средняя площадь повреждённой территории: <input type=text id='SredPloshad'><br>"
-    div1.innerHTML = div1.innerHTML + "Среднеквадратическое отклонение: <input type=text id='Otklonenie'><br>"
-    div1.innerHTML = div1.innerHTML + "Коэффициент: <input type=text id='koef'><br>"
-
-    if (a.length>0) {
-        for (let i=1;i<=n;i++) {
-            element1 = "ploshad" + i;
-            element2 = "koord" + i;	/////////////////////////////
-            if(localStorage[element2]==undefined) {localStorage[element2]=""}            
-
-            document.getElementById(element1).value = a[i-1];
+        if (a.length > 0) {
+            for (let i = 1; i <= n; i++) {
+                let element1 = "ploshad" + i;
+                document.getElementById(element1).value = a[i - 1];
+            }
         }
-    }
 
-    localStorage["ChisloYchastkov"] = n;
+        localStorage["ChisloYchastkov"] = n;
+        Calc()
+        mytextarea.value = '';
 }
 
-function savedtext(){
+function savedtext() {
+
     let n=ChisloYchastkov.value;
     let mysavedtext="";
-    for(let i=1;i<=n;i++)
-    {
-    element1="ploshad"+i;
-    mysavedtext=mysavedtext+document.getElementById(element1).value+';';
+
+    for(let i=1;i<=n;i++) {
+        element1="ploshad"+i;
+        mysavedtext=mysavedtext+document.getElementById(element1).value+';';
     }
+
     document.write('<a href="data:text/plain;charset=utf-8,%EF%BB%BF' + encodeURIComponent(mysavedtext) + '" download="значения.txt">значения.txt</a>');
 }
 
@@ -528,6 +537,86 @@ function map() { //////////////////////////////////////////////////////
             ctx.font = "italic 16pt Arial";
             ctx.fillText(document.getElementById(element1).value, sredX, sredY);
         }
+    }
+
+let colored = null;
+
+    //функция для выделения выбранного участка
+    function drawColourMap(index) {
+        if (colored !== null) {
+            redrawColourMap();
+        }
+        colored = index;
+        redrawMap();
+    }
+
+    //сброс выделения
+    function redrawColourMap() {
+        colored = null;
+        redrawMap();
+    }
+
+    //перерисовка карты
+    function redrawMap() {
+        let canv = document.getElementById("canv2");
+        let ctx = canv.getContext("2d");
+        ctx.clearRect(0, 0, canv.width, canv.height);
+
+        let pic = new Image();
+        pic.src = "map.jpg";
+        pic.onload = function() {
+            ctx.drawImage(pic, 0, 0, canv.width, canv.height);
+
+            let n = parseFloat(ChisloYchastkov.value);
+            for (let i = 1; i <= n; i++) {
+                let sredX = 0;
+                let sredY = 0;
+                let element1 = "ploshad" + i;
+                let element2 = "koord" + i;
+                let koord = document.getElementById(element2).value;
+                let koordmass = koord.split(";");
+
+
+                let ploshadValue = parseFloat(document.getElementById(element1).value);
+                let sredPloshad = parseFloat(SredPloshad.value);
+                let otklonenie = parseFloat(Otklonenie.value);
+                let koef = parseFloat(document.getElementById("koef").value);
+
+
+                if (colored === i) {
+                    ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
+                } else if ((ploshadValue - sredPloshad) / otklonenie >= koef) {
+                    ctx.fillStyle = "rgba(255, 0, 0, 0.7)";
+                } else if (Math.abs(ploshadValue - sredPloshad) <= otklonenie) {
+                    let zelVariant = Math.floor(255 * (1 - Math.abs(ploshadValue - sredPloshad) / (otklonenie)));
+                    ctx.fillStyle = `rgba(0, ${zelVariant}, 0, 0.7)`;
+                } else {
+                    ctx.fillStyle = "rgba(255, 255, 0, 0.7)";
+                }
+
+                ctx.beginPath();
+                for (let j = 1; j < koordmass.length; j += 2) {
+                    if (j > 1) {
+                        ctx.lineTo(koordmass[j - 1], koordmass[j]);
+                    } else {
+                        ctx.moveTo(koordmass[j - 1], koordmass[j]);
+                    }
+
+                    sredX += parseFloat(koordmass[j - 1]);
+                    sredY += parseFloat(koordmass[j]);
+                }
+
+                ctx.fill();
+                ctx.closePath();
+
+                sredX /= (koordmass.length / 2);
+                sredY /= (koordmass.length / 2);
+
+                ctx.fillStyle = "black";
+                ctx.font = "italic 16pt Arial";
+                ctx.fillText(ploshadValue, sredX, sredY);
+            }
+        };
     }
 
 }
