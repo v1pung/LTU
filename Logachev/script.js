@@ -239,25 +239,40 @@ function TableYchastki() {
             localStorage[element1] = parametr[i - 1];
         }
 
-        div1.innerHTML += `
-            <div style='display: inline-block; width: 400px;'>Площадь повреждённой территории на ${i} участке:</div>
-            <input type='text' id='ploshad${i}' value='${localStorage[element1]}' onclick="drawColourMap(${i})">
-            <div style='display:inline-block;width:275px'>Координаты контура <b>${i}-го участка</b></div>
-            <input type='text' id='koord${i}' value='${localStorage[element2]}'>
-            <div id='lolkek${i}' style='display:inline-block'></div><br>`;
-
         // Добавляем значения в массив для сортировки
-        values.push(parseFloat(localStorage[element1]));
+        values.push({
+            index: i,  // Индекс для восстановления порядка
+            area: parseFloat(localStorage[element1]),  // Площадь участка
+            coordinates: localStorage[element2],  // Координаты
+        });
     }
 
     // Сортируем значения по возрастанию
-    values.sort((a, b) => a - b);
+    values.sort((a, b) => a.area - b.area);
 
-    // Обновляем поля ввода с отсортированными значениями
-    for (let i = 1; i <= n; i++) {
-        let element1 = "ploshad" + i;
-        document.getElementById(element1).value = values[i - 1];  // Присваиваем отсортированное значение
-    }
+    // Перерисовываем div1 с отсортированными значениями
+    div1.innerHTML = values.map(item => {
+        let ploshadElem = document.getElementById("ploshad" + item.index);
+        let koordElem = document.getElementById("koord" + item.index);
+
+        // Проверяем, существуют ли элементы на момент выполнения
+        if (!ploshadElem || !koordElem) {
+            // Если элементы еще не созданы, создаём их
+            return `
+                <div style='display: inline-block; width: 400px;'>Площадь повреждённой территории на ${item.index} участке:</div>
+                <input type='text' id='ploshad${item.index}' value='${item.area}' onclick="drawColourMap(${item.index})">
+                <div style='display:inline-block;width:275px'>Координаты контура <b>${item.index}-го участка</b></div>
+                <input type='text' id='koord${item.index}' value='${item.coordinates}'>
+                <div id='lolkek${item.index}' style='display:inline-block'></div><br>
+            `;
+        }
+
+        // Если элементы уже существуют, обновляем их
+        ploshadElem.value = item.area;
+        koordElem.value = item.coordinates;
+
+        return "";
+    }).join('');
 
     div1.innerHTML += `
         <hr>
@@ -274,6 +289,8 @@ function TableYchastki() {
     // Привязываем события после добавления элементов
     bindFocusEvents();
 }
+
+
 
 
 // Функция для привязки событий focus и blur к полям
@@ -548,11 +565,6 @@ function drawThresholdLines(max, min, mid, disp, ctx, maxv) {
     ctx.stroke();
     ctx.closePath();
 }
-
-
-
-
-
 
 
 function map() {
