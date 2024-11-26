@@ -4,10 +4,19 @@
     <meta charset="UTF-8">
     <script src="script.js"></script>
 
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body onLoad="myLoad()">
 
-    <b>Количество лесных участков, подверженных болезни (вылечим)</b><br><br>
+    <b>Количество лесных участков, подверженных болезни</b><br><br>
+
+    <label><input type="checkbox" id="toggle-textarea">Область для вставки значений</label>
+    <label><input type="checkbox" id="toggle-canvas1">График</label>
+    <label><input type="checkbox" id="toggle-canvas2">Карта</label>
 
     <input type="text" value="10" id="ChisloYchastkov" style="width: 70px; text-align: center;">
     <input type="button" value="-" onClick="if (parseInt(ChisloYchastkov.value) > 0) { ChisloYchastkov.value = parseInt(ChisloYchastkov.value) - 1; TableYchastki(); }" id="ButtonDecrease">
@@ -20,13 +29,13 @@
     <div id="div1" style="display:none"></div>
 
     <br>
-    <textarea id="mytextarea" placeholder="Скопируйте сюда все значения"
+    <textarea id="mytextarea" class="hidden" placeholder="Скопируйте сюда все значения"
     style="width:300px;"></textarea><br><hr>
     <input type="button" value="Сохранить" onClick="preSaveCheck()" id="Button3"><br><hr>
     <input type="button" value="Удалить введённые значения" onClick="deletepole()" id="Button4"><br><hr>
 
-    <canvas id='canv' style="width: 500px; height: 250px; border: 1px double black">Обновите браузер</canvas>
-    <canvas id='canv2' style="width: 500px; height: 250px; border: 1px double black">Обновите браузер</canvas>
+    <canvas id='canv' class="hidden" style="width: 500px; height: 250px; border: 1px double black">Обновите браузер</canvas>
+    <canvas id='canv2' class="hidden" style="width: 500px; height: 250px; border: 1px double black">Обновите браузер</canvas>
 
 </body>
 </html>
